@@ -15,19 +15,20 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 
 	@Override
 	public Employee getEmployeeByID(Integer employeeID) {
+		System.out.println("%%%%%%%%%%%%% Gaju ************** ID in DAOImpl: " +employeeID);
 		return entityManager.find(Employee.class, employeeID);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Employee> getAllEmployees() {
-		String hql = "FROM Employee as atcl ORDER BY atcl.articleId";
+		String hql = "FROM Employee as emp ORDER BY emp.employeeID";
 		return (List<Employee>) entityManager.createQuery(hql).getResultList();
 	}
 
 	@Override
-	public void addEmployee(Employee article) {
-		entityManager.persist(article);
+	public void addEmployee(Employee emp) {
+		entityManager.persist(emp);
 	}
 
 	@Override

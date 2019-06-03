@@ -1,11 +1,22 @@
 package com.example.beans;
 
+import javax.persistence.Entity;
+
+@Entity
 public class Employee {
 
 	private String firstName;
 	private String lastName;
 	private Integer employeeID;
 	
+	public Employee() {
+	}
+	
+	public Employee(String firstName, String lastName, Integer employeeID) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.employeeID = employeeID;
+	}
 	public String getFirstName() {
 		return firstName;
 	}
