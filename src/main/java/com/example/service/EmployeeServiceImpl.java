@@ -1,6 +1,10 @@
 package com.example.service;
 
 import java.util.List;
+
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
+
 import com.example.beans.Employee;
 import com.example.dao.EmployeeDAO;
 
@@ -9,31 +13,36 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-	@Autowired
 	private EmployeeDAO employeeDAO;
 
-	@Override
-	public Employee getEmployeeByID(Integer employeeID) {
-		return employeeDAO.getEmployeeByID(employeeID);
+	@Autowired
+	public EmployeeServiceImpl(EmployeeDAO employeeDAO) {
+		this.employeeDAO = employeeDAO;
 	}
 
-	@Override
-	public List<Employee> getAllEmployees() {
-		return employeeDAO.getAllEmployees();
+	public Employee save(Employee employee) {
+		if (employee.getId() != null) {
+			throw new EntityExistsException("Already exist!");
+		}
+		return employeeDAO.save(employee);
 	}
 
-	@Override
-	public void addEmployee(Employee employee) {
-		employeeDAO.addEmployee(employee);
+	public Employee update(Employee employee) {
+		if (employee.getId() != null) {
+			throw new EntityNotFoundException("No entity exist!");
+		}
+		return employeeDAO.save(employee);
 	}
 
-	@Override
-	public void updateEmployee(Employee employee) {
-		employeeDAO.updateEmployee(employee);
+	public List<Employee> findAll() {
+		return employeeDAO.findAll();
 	}
 
-	@Override
-	public void deleteEmployee(Integer employeeID) {
-		employeeDAO.deleteEmployee(employeeID);
+	public Employee findOne(Integer id) {
+		return employeeDAO.findOne(id);
+	}
+
+	public void delete(Integer id) {
+		employeeDAO.delete(id);
 	}
 }

@@ -5,14 +5,15 @@ import java.util.List;
 import com.example.beans.Employee;
 
 public interface EmployeeDAO {
-	List<Employee> getAllEmployees();
 
-	Employee getEmployeeByID(Integer employeeID);
+	Employee save(Employee employee);
+	
+	Employee update(Employee employee);
 
-	void addEmployee(Employee emp);
+	List<Employee> findAll();
 
-	void updateEmployee(Employee emp);
+	Employee findOne(Integer id);
 
-	void deleteEmployee(Integer employeeID);
+	void delete(Integer id);
 
 }

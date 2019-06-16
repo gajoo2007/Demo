@@ -3,6 +3,8 @@ package com.example.dao;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.beans.Employee;
@@ -14,33 +16,37 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 	private EntityManager entityManager;
 
 	@Override
-	public Employee getEmployeeByID(Integer employeeID) {
-		System.out.println("%%%%%%%%%%%%% Gaju ************** ID in DAOImpl: " +employeeID);
-		return entityManager.find(Employee.class, employeeID);
+	public Employee findOne(Integer id) {
+		System.out.println("%%%%%%%%%%%%% Gaju ************** ID in DAOImpl: " +id);
+		return entityManager.find(Employee.class, id);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Employee> getAllEmployees() {
-		String hql = "FROM Employee as emp ORDER BY emp.employeeID";
-		return (List<Employee>) entityManager.createQuery(hql).getResultList();
+	public List<Employee> findAll() {
+		String hql = "FROM Employee as emp ORDER BY emp.id";
+		Query query = entityManager.createQuery(hql);
+		List<Employee> empList = query.getResultList();
+		return empList;
 	}
 
 	@Override
-	public void addEmployee(Employee emp) {
+	public Employee save(Employee emp) {
 		entityManager.persist(emp);
+		return emp;
 	}
 
 	@Override
-	public void updateEmployee(Employee emp) {
-		Employee employee = getEmployeeByID(emp.getEmployeeID());
+	public Employee update(Employee emp) {
+		Employee employee = findOne(emp.getId());
 		employee.setFirstName(emp.getFirstName());
 		employee.setLastName(emp.getLastName());
 		entityManager.flush();
+		return employee;
 	}
 
 	@Override
-	public void deleteEmployee(Integer employeeID) {
-		entityManager.remove(getEmployeeByID(employeeID));
+	public void delete(Integer id) {
+		entityManager.remove(findOne(id));
 	}
 }

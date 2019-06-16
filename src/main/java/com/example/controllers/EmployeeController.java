@@ -1,58 +1,64 @@
 package com.example.controllers;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.beans.Employee;
 import com.example.service.EmployeeService;
 
 @RestController
+@RequestMapping("/api")
 public class EmployeeController {
-	@Autowired
+
 	private EmployeeService employeeService;
 
-	@GetMapping("employee/{id}")
-	public ResponseEntity<Employee> getEmployeeById(@PathVariable("id") Integer id) {
-		System.out.println("EmployeeService - Id: " +id);
-		Employee employee = employeeService.getEmployeeByID(id);
-		return new ResponseEntity<Employee>(employee, HttpStatus.OK);
+	public EmployeeController(EmployeeService employeeService) {
+		this.employeeService = employeeService;
 	}
 
-	@GetMapping("employees")
-	public ResponseEntity<List<Employee>> getAllEmployees() {
-		List<Employee> list = employeeService.getAllEmployees();
-		return new ResponseEntity<List<Employee>>(list, HttpStatus.OK);
+	@RequestMapping(value = "employee", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<Employee> getAllEmployees() {
+		return employeeService.findAll();
 	}
 
-	@PostMapping("employee")
-	public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) {
-		employeeService.addEmployee(employee);
-		//HttpHeaders headers = new HttpHeaders();
-		//headers.setLocation(builder.path("/employee/{id}").buildAndExpand(employee.getEmployeeID()).toUri());
-		return new ResponseEntity<Employee>(employee, HttpStatus.CREATED);
+	@RequestMapping(value = "employee", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) throws URISyntaxException {
+		try {
+			Employee result = employeeService.save(employee);
+			return ResponseEntity.created(new URI("/api/employee/" + result.getId())).body(result);
+		} catch (EntityExistsException e) {
+			return new ResponseEntity<Employee>(HttpStatus.CONFLICT);
+		}
 	}
 
-	@PutMapping("employee")
-	public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) {
-		employeeService.updateEmployee(employee);
-		return new ResponseEntity<Employee>(employee, HttpStatus.OK);
+	@RequestMapping(value = "employee", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) throws URISyntaxException {
+		if (employee.getId() == null) {
+			return new ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
+		}
+
+		try {
+			Employee result = employeeService.update(employee);
+			return ResponseEntity.created(new URI("/api/employee/" + result.getId())).body(result);
+		} catch (EntityNotFoundException e) {
+			return new ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
+		}
 	}
 
-	@DeleteMapping("employee/{id}")
-	public ResponseEntity<Void> deleteEmployee(@PathVariable("id") Integer id) {
-		employeeService.deleteEmployee(id);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+	@RequestMapping(value = "/employee/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Void> deleteEmployee(@PathVariable Integer id) {
+		employeeService.delete(id);
+		return ResponseEntity.ok().build();
 	}
 }

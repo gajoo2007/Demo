@@ -5,13 +5,14 @@ import java.util.List;
 import com.example.beans.Employee;
 
 public interface EmployeeService {
-	List<Employee> getAllEmployees();
 
-	Employee getEmployeeByID(Integer employeeID);
+	Employee save(Employee employee);
+	
+	Employee update(Employee employee);
 
-	void addEmployee(Employee employee);
+	List<Employee> findAll();
 
-	void updateEmployee(Employee employee);
+	Employee findOne(Integer id);
 
-	void deleteEmployee(Integer employeeID);
+	void delete(Integer id);
 }
